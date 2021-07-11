@@ -6,8 +6,8 @@ from django.contrib import admin
 from django.core.files.storage import default_storage
 from django.shortcuts import render, redirect
 from django.urls import path
-from acme.products.models import Product
-from acme.products.csv_import import csv_import_async
+from acme.products.models import Product, Webhook
+from acme.products.helpers import csv_import_async, post_to_webhooks
 
 
 class CsvImportForm(forms.Form):
@@ -15,8 +15,8 @@ class CsvImportForm(forms.Form):
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_filter = ('is_active',)
-    list_display = ('name', 'sku', 'description', 'is_active')
+    list_filter = ('active',)
+    list_display = ('name', 'sku', 'description', 'active')
     search_fields = ('name', 'sku', 'description')
     change_list_template = "products/product_changelist.html"
 
@@ -65,4 +65,15 @@ class ProductAdmin(admin.ModelAdmin):
             request, "products/delete_all.html",
         )
 
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        post_to_webhooks.delay(obj.sku)
+
+
+class WebhookAdmin(admin.ModelAdmin):
+    list_filter = ('active',)
+    list_display = ('url',)
+
+
 admin.site.register(Product, ProductAdmin)
+admin.site.register(Webhook, WebhookAdmin)
