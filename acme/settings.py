@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 import django_heroku
 from pathlib import Path
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -77,11 +78,13 @@ WSGI_APPLICATION = 'acme.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'acme',
+        'USER': 'acme',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1'
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -127,5 +130,8 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+prod_db  =  dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(prod_db)
 
 django_heroku.settings(locals())
