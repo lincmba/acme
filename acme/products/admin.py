@@ -21,6 +21,7 @@ class ProductAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         my_urls = [
             path('import-csv/', self.import_csv),
+            path('delete-all/', self.delete_all),
         ]
         return my_urls + urls
 
@@ -45,5 +46,16 @@ class ProductAdmin(admin.ModelAdmin):
             request, "products/csv_form.html", payload
         )
 
+    def delete_all(self, request):
+        """
+        Custom method to delete all products.
+        """
+        if request.method == "POST":
+            Product.objects.all().delete()
+            self.message_user(request, "All products have been deleted")
+            return redirect("..")
+        return render(
+            request, "products/delete_all.html",
+        )
 
 admin.site.register(Product, ProductAdmin)
