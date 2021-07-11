@@ -9,4 +9,4 @@ class Product(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
-    is_active = models.BooleanField(blank=True, null=True, default=True)
+    is_active = models.BooleanField(blank=True, null=True)

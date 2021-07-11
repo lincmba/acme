@@ -14,7 +14,9 @@ class CsvImportForm(forms.Form):
 
 
 class ProductAdmin(admin.ModelAdmin):
-
+    list_filter = ('is_active',)
+    list_display = ('name', 'sku', 'description', 'is_active')
+    search_fields = ('name', 'sku', 'description')
     change_list_template = "products/product_changelist.html"
 
     def get_urls(self):
@@ -35,9 +37,11 @@ class ProductAdmin(admin.ModelAdmin):
             csv_file = request.FILES["csv_file"]
             csv_reader = ucsv.DictReader(csv_file, encoding='utf-8-sig')
             for row in csv_reader:
-                Product.objects.update_or_create(
-                        sku=row.get('sku'), name=row.get('name'),
-                        description=row.get('description'))
+                product, created = Product.objects.get_or_create(
+                    sku=row.get('sku'))
+                product.name = row.get('name')
+                product.description=row.get('description')
+                product.save()
             self.message_user(request, "Your csv file has been imported")
             return redirect("..")
         form = CsvImportForm()
