@@ -37,7 +37,7 @@ class ProductAdmin(admin.ModelAdmin):
         Uses a form to upload the csv, and performs a product creation or
         update based on whether the sku exists in the database
         """
-        if request.method == "POST":
+        if request.method == "GET":
             S3_BUCKET = "acme-inc"
 
             file_name = request.args.get('file_name')
@@ -59,18 +59,42 @@ class ProductAdmin(admin.ModelAdmin):
             return json.dumps({
                 'data': presigned_post,
                 'url': 'https://%s.s3.amazonaws.com/%s' % (
-                S3_BUCKET, file_name)
+                    S3_BUCKET, file_name)
             })
+        if request.method == "POST":
+            # S3_BUCKET = "acme-inc"
+            #
+            # file_name = request.args.get('file_name')
+            # file_type = request.args.get('file_type')
+            #
+            # s3 = boto3.client('s3')
+            #
+            # presigned_post = s3.generate_presigned_post(
+            #     Bucket=S3_BUCKET,
+            #     Key=file_name,
+            #     Fields={"acl": "public-read", "Content-Type": file_type},
+            #     Conditions=[
+            #         {"acl": "public-read"},
+            #         {"Content-Type": file_type}
+            #     ],
+            #     ExpiresIn=3600
+            # )
+            #
+            # return json.dumps({
+            #     'data': presigned_post,
+            #     'url': 'https://%s.s3.amazonaws.com/%s' % (
+            #     S3_BUCKET, file_name)
+            # })
             # csv_file = request.FILES["csv_file"]
             #
             # upload_to = os.path.join(csv_file.name)
             # file_name = default_storage.save(upload_to, csv_file)
             # task = csv_import_async.delay(file_name, request.user.username)
 
-            # self.message_user(
-            #     request,
-            #     f"Your CSV is being imported, task_id : {task.task_id}")
-            # return redirect("..")
+            self.message_user(
+                request,
+                f"Your CSV is being imported")
+            return redirect("..")
         form = CsvImportForm()
         payload = {"form": form}
         return render(
