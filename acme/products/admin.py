@@ -38,8 +38,7 @@ class ProductAdmin(admin.ModelAdmin):
         if request.method == "POST":
             csv_file = request.FILES["csv_file"]
 
-            upload_to = os.path.join(request.user.username,
-                                     'csv_imports', csv_file.name)
+            upload_to = os.path.join(csv_file.name)
             file_name = default_storage.save(upload_to, csv_file)
             task = csv_import_async.delay(file_name, request.user.username)
 
