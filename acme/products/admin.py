@@ -1,5 +1,5 @@
 import os
-
+from django.http import HttpResponse
 from django import forms
 import boto3
 import json
@@ -54,11 +54,13 @@ class ProductAdmin(admin.ModelAdmin):
                 ],
                 ExpiresIn=3600
             )
-            return json.dumps({
+            resp_data = json.dumps({
                 'data': presigned_post,
                 'url': 'https://%s.s3.amazonaws.com/%s' % (
                     S3_BUCKET, file_name)
             })
+            return HttpResponse(resp_data)
+
         if request.method == "POST":
             # S3_BUCKET = "acme-inc"
             #
