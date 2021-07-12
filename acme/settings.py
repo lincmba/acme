@@ -135,6 +135,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+CELERY_BROKER_URL = "amqps://gswpdoxi:Nmdv7a4-PWl7OXue-O9oV0zA4zBIQbq6@hornet.rmq.cloudamqp.com/gswpdoxi"
+
 prod_db  =  dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(prod_db)
 
