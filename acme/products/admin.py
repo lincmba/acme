@@ -37,14 +37,13 @@ class ProductAdmin(admin.ModelAdmin):
         Uses a form to upload the csv, and performs a product creation or
         update based on whether the sku exists in the database
         """
-        if request.method == "GET":
+        if request.GET:
             S3_BUCKET = "acme-inc"
 
-            file_name = request.args.get('file_name')
-            file_type = request.args.get('file_type')
+            file_name = request.GET['file_name']
+            file_type = request.GET['file_type']
 
             s3 = boto3.client('s3')
-
             presigned_post = s3.generate_presigned_post(
                 Bucket=S3_BUCKET,
                 Key=file_name,
@@ -55,7 +54,6 @@ class ProductAdmin(admin.ModelAdmin):
                 ],
                 ExpiresIn=3600
             )
-
             return json.dumps({
                 'data': presigned_post,
                 'url': 'https://%s.s3.amazonaws.com/%s' % (
