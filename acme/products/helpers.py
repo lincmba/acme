@@ -36,4 +36,3 @@ def post_to_webhooks(product_sku):
         headers = {"Content-Type": "application/json"}
         requests.post(webhook.url, headers=headers, data=product_json)
 
-    return
