@@ -1,3 +1,3 @@
 # acme
 
-Application to facilitage product ingestion for Acme Inc
+Application to facilitate product ingestion
