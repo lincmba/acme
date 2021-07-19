@@ -46,7 +46,10 @@ class ProductAdmin(admin.ModelAdmin):
 
             s3 = boto3.client(
                 's3',
-                config=Config(signature_version='s3v4')
+                config=Config(
+                    signature_version='s3v4',
+                    region_name='us-east-2'
+                )
             )
             presigned_post = s3.generate_presigned_post(
                 Bucket=S3_BUCKET,
