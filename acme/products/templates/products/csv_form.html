@@ -6,7 +6,7 @@
             {{ form.as_p }}
             {% csrf_token %}
             <div class="progress-wrapper">
-                <div id="progress-bar-file" class="progress"><p>Uploading to S3</p></div>
+                <div id="progress-bar-file" class="progress"></div>
             </div>
             <button id="submit-button" type="submit" disabled>Upload CSV</button>
         </form>

@@ -1,26 +1,39 @@
+import codecs
+import csv
+import boto3
 import unicodecsv as ucsv
+from botocore.client import Config
 import requests
 from acme.celery import app
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from acme.products.models import Product, Webhook
+from acme.constants import ACME_S3_BUCKET
 
 @app.task()
 def csv_import_async(file_name, user_name=None):
-    with default_storage.open(file_name) as csv_file:
-        if user_name:
-            user = User.objects.get(username=user_name)
-        processed = 0
-        csv_reader = ucsv.DictReader(csv_file, encoding='utf-8-sig')
-        for row in csv_reader:
-            product, created = Product.objects.get_or_create(
-                sku=row.get('sku'))
-            product.name = row.get('name')
-            product.description = row.get('description')
-            product.created_by = user
-            product.save()
-            processed +=1
-        return {"processed_products": processed}
+    s3 = boto3.client(
+        's3',
+        config=Config(
+            signature_version='s3v4',
+            region_name='us-east-2'
+        )
+    )
+    obj = s3.get_object(Bucket=ACME_S3_BUCKET, Key=file_name)
+
+    if user_name:
+        user = User.objects.get(username=user_name)
+    processed = 0
+    csv_reader = ucsv.DictReader(codecs.getreader("utf-8")(obj["Body"]), encoding='utf-8-sig')
+    for row in csv_reader:
+        product, created = Product.objects.get_or_create(
+            sku=row.get('sku'))
+        product.name = row.get('name')
+        product.description = row.get('description')
+        product.created_by = user
+        product.save()
+        processed +=1
+    return {"processed_products": processed}
 
 @app.task()
 def post_to_webhooks(product_sku):

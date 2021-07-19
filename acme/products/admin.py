@@ -1,4 +1,3 @@
-import os
 from django.http import HttpResponse
 from django import forms
 import boto3
@@ -6,12 +5,11 @@ import json
 from botocore.client import Config
 
 from django.contrib import admin
-from django.core.files.storage import default_storage
 from django.shortcuts import render, redirect
 from django.urls import path
 from acme.products.models import Product, Webhook
 from acme.products.helpers import csv_import_async, post_to_webhooks
-
+from acme.constants import ACME_S3_BUCKET
 
 class CsvImportForm(forms.Form):
     csv_file = forms.FileField()
@@ -39,8 +37,7 @@ class ProductAdmin(admin.ModelAdmin):
         update based on whether the sku exists in the database
         """
         if request.GET:
-            S3_BUCKET = "acme-inc"
-
+            S3_BUCKET = ACME_S3_BUCKET
             file_name = request.GET['file_name']
             file_type = request.GET['file_type']
 
@@ -69,34 +66,9 @@ class ProductAdmin(admin.ModelAdmin):
             return HttpResponse(resp_data)
 
         if request.method == "POST":
-            # S3_BUCKET = "acme-inc"
-            #
-            # file_name = request.args.get('file_name')
-            # file_type = request.args.get('file_type')
-            #
-            # s3 = boto3.client('s3')
-            #
-            # presigned_post = s3.generate_presigned_post(
-            #     Bucket=S3_BUCKET,
-            #     Key=file_name,
-            #     Fields={"acl": "public-read", "Content-Type": file_type},
-            #     Conditions=[
-            #         {"acl": "public-read"},
-            #         {"Content-Type": file_type}
-            #     ],
-            #     ExpiresIn=3600
-            # )
-            #
-            # return json.dumps({
-            #     'data': presigned_post,
-            #     'url': 'https://%s.s3.amazonaws.com/%s' % (
-            #     S3_BUCKET, file_name)
-            # })
-            # csv_file = request.FILES["csv_file"]
-            #
-            # upload_to = os.path.join(csv_file.name)
-            # file_name = default_storage.save(upload_to, csv_file)
-            # task = csv_import_async.delay(file_name, request.user.username)
+
+            file_name = request.args.get('file_name')
+            task = csv_import_async.delay(file_name, request.user.username)
 
             self.message_user(
                 request,
