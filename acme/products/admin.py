@@ -12,7 +12,7 @@ from acme.products.helpers import csv_import_async, post_to_webhooks
 from acme.constants import ACME_S3_BUCKET
 
 class CsvImportForm(forms.Form):
-    csv_file = forms.FileField()
+    csv_file = forms.FileField(required=False)
 
 
 class ProductAdmin(admin.ModelAdmin):

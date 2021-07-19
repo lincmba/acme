@@ -60,13 +60,14 @@ function uploadFile(file, s3Data, url){
 
         if (e.loaded <= fileSize) {
             var percent = Math.round(e.loaded / fileSize * 100);
-            $('#progress-bar-file').width(percent + '%').html(percent + '%');
+            $('#progress-bar-file').width(percent + '%').html('Uploading...' + percent + '%');
         }
 
         if(e.loaded === e.total){
             document.getElementById("file-name").value = file.name;
             document.getElementById("submit-button").disabled = false;
-            $('#progress-bar-file').width(100 + '%').html(100 + '%');
+            document.getElementById("id_csv_file").value = null;
+            $('#progress-bar-file').width(100 + '%').html(100 + '%' + ' Uploaded');
         }
     });
 
