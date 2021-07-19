@@ -8,7 +8,7 @@
             <div class="progress-wrapper">
                 <div id="progress-bar-file" class="progress"></div>
             </div>
-            <button id="submit-button" type="submit" disabled="True">Upload CSV</button>
+            <button id="submit-button" type="submit" disabled>Upload CSV</button>
         </form>
     </div>
     <br />
@@ -22,6 +22,7 @@
     padding:5px 0px 5px 0px;
 }
 </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
     <script>
     (function() {
   document.getElementById("id_csv_file").onchange = function(){
@@ -58,12 +59,12 @@ function uploadFile(file, s3Data, url){
 
         if (e.loaded <= fileSize) {
             var percent = Math.round(e.loaded / fileSize * 100);
-            document.getElementById("progress-bar-file").width(percent + '%').html(percent + '%');
+            $('#progress-bar-file').width(percent + '%').html(percent + '%');
         }
 
         if(e.loaded === e.total){
-            document.getElementById("progress-bar-file").width(100 + '%').html(100 + '%');
-            document.getElementById("submit-button").disabled = false;
+            $('#submit-button').disabled = false;
+            $('#progress-bar-file').width(100 + '%').html(100 + '%');
         }
     });
 
