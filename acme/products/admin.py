@@ -36,11 +36,14 @@ class ProductAdmin(admin.ModelAdmin):
         Uses a form to upload the csv, and performs a product creation or
         update based on whether the sku exists in the database
         """
+
         if request.GET:
-            S3_BUCKET = ACME_S3_BUCKET
+            """
+            Sends file to s3 bucket
+            """
             file_name = request.GET['file_name']
             file_type = request.GET['file_type']
-
+            S3_BUCKET = ACME_S3_BUCKET
             s3 = boto3.client(
                 's3',
                 config=Config(
@@ -66,9 +69,11 @@ class ProductAdmin(admin.ModelAdmin):
             return HttpResponse(resp_data)
 
         if request.method == "POST":
-
-            file_name = request.args.get('file_name')
-            task = csv_import_async.delay(file_name, request.user.username)
+            """
+            Triggers importing csv from s3 bucket
+            """
+            file_name = request.GET['file_name']
+            csv_import_async.delay(file_name, request.user.username)
 
             self.message_user(
                 request,

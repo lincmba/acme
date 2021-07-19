@@ -12,6 +12,15 @@ from acme.constants import ACME_S3_BUCKET
 
 @app.task()
 def csv_import_async(file_name, user_name=None):
+    """
+    Performs csv import in the background in the following steps
+    - Imports csv file from s3 bucket
+    - Reads file
+    - Creates products from those in the csv file
+    :param file_name: Name of file as stored in s3
+    :param user_name: Current user's username
+    :return:
+    """
     s3 = boto3.client(
         's3',
         config=Config(
@@ -37,6 +46,11 @@ def csv_import_async(file_name, user_name=None):
 
 @app.task()
 def post_to_webhooks(product_sku):
+    """
+    Sends product data in json to all active webhooks
+    :param product_sku:
+    :return:
+    """
     product = Product.objects.get(sku=product_sku)
     product_json = {
         "name": product.id,
