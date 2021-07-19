@@ -72,7 +72,7 @@ class ProductAdmin(admin.ModelAdmin):
             """
             Triggers importing csv from s3 bucket
             """
-            file_name = request.GET['file_name']
+            file_name = request.POST['file-name']
             csv_import_async.delay(file_name, request.user.username)
 
             self.message_user(

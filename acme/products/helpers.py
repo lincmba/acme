@@ -33,7 +33,7 @@ def csv_import_async(file_name, user_name=None):
     if user_name:
         user = User.objects.get(username=user_name)
     processed = 0
-    csv_reader = ucsv.DictReader(codecs.getreader("utf-8")(obj["Body"]), encoding='utf-8-sig')
+    csv_reader = csv.DictReader(codecs.getreader("utf-8")(obj["Body"]))
     for row in csv_reader:
         product, created = Product.objects.get_or_create(
             sku=row.get('sku'))
