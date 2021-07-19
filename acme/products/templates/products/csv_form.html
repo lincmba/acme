@@ -5,11 +5,24 @@
         <form action="" method="POST" enctype="multipart/form-data">
             {{ form.as_p }}
             {% csrf_token %}
-
-                <button type="submit">Upload CSV</button>
+            <div class="progress-wrapper">
+                <div id="progress-bar-file" class="progress"></div>
+            </div>
+            <button type="submit">Upload CSV</button>
         </form>
     </div>
     <br />
+    <style>
+.progress-wrapper {
+    width:100%;
+}
+.progress-wrapper .progress {
+    background-color:green;
+    width:0%;
+    padding:5px 0px 5px 0px;
+}
+</style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
     <script>
     (function() {
   document.getElementById("id_csv_file").onchange = function(){
@@ -41,6 +54,19 @@ function uploadFile(file, s3Data, url){
   var xhr = new XMLHttpRequest();
   xhr.open("POST", s3Data.url);
 
+  xhr.upload.addEventListener('progress', function (e) {
+        var fileSize = file.size;
+
+        if (e.loaded <= fileSize) {
+            var percent = Math.round(e.loaded / fileSize * 100);
+            $('#progress-bar-file').width(percent + '%').html(percent + '%');
+        }
+
+        if(e.loaded == e.total){
+            $('#progress-bar-file').width(100 + '%').html(100 + '%');
+        }
+    });
+
   var postData = new FormData();
   for(key in s3Data.fields){
     postData.append(key, s3Data.fields[key]);
@@ -49,7 +75,6 @@ function uploadFile(file, s3Data, url){
 
   xhr.onreadystatechange = function() {
     if(xhr.readyState === 4){
-        alert(xhr.responseText);
       if(xhr.status === 200 || xhr.status === 204){
         document.getElementById("id_csv_file").src = url;
       }
