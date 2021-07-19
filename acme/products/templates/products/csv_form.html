@@ -6,7 +6,7 @@
             {{ form.as_p }}
             {% csrf_token %}
             <div class="progress-wrapper">
-                <div id="progress-bar-file" class="progress"></div>
+                <div id="progress-bar-file" class="progress"><p>Uploading to S3</p></div>
             </div>
             <button id="submit-button" type="submit" disabled>Upload CSV</button>
         </form>
@@ -63,7 +63,7 @@ function uploadFile(file, s3Data, url){
         }
 
         if(e.loaded === e.total){
-            $('#submit-button').disabled = false;
+            document.getElementById("submit-button").disabled = false;
             $('#progress-bar-file').width(100 + '%').html(100 + '%');
         }
     });
