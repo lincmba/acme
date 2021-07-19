@@ -1,12 +1,10 @@
 import codecs
 import csv
 import boto3
-import unicodecsv as ucsv
 from botocore.client import Config
 import requests
 from acme.celery import app
 from django.contrib.auth.models import User
-from django.core.files.storage import default_storage
 from acme.products.models import Product, Webhook
 from acme.constants import ACME_S3_BUCKET
 

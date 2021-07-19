@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-dfay+!n1!x@hdi02&=)c)j2^m1apa7s*3p-w5ag))cwc0-i!i!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     "https://acme-inc-products.herokuapp.com",
@@ -84,7 +84,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'acme',
-        'USER': 'acme',
+        'USER': 'lincolnsimba',
         'PASSWORD': '',
         'HOST': '127.0.0.1'
     }

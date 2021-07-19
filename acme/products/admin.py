@@ -1,5 +1,4 @@
 from django.http import HttpResponse
-from django import forms
 import boto3
 import json
 from botocore.client import Config
@@ -7,15 +6,16 @@ from botocore.client import Config
 from django.contrib import admin
 from django.shortcuts import render, redirect
 from django.urls import path
+from acme.products.forms import CsvImportForm
 from acme.products.models import Product, Webhook
 from acme.products.helpers import csv_import_async, post_to_webhooks
 from acme.constants import ACME_S3_BUCKET
 
-class CsvImportForm(forms.Form):
-    csv_file = forms.FileField(required=False)
-
 
 class ProductAdmin(admin.ModelAdmin):
+    """
+    This class facilitates custom ProductAdmin implementations
+    """
     list_filter = ('active',)
     list_display = ('name', 'sku', 'description', 'active')
     search_fields = ('name', 'sku', 'description')

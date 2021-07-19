@@ -3,9 +3,8 @@
 Application to facilitate product ingestion
 
 ### Installation
-To install the project, first of all, create a virtualenv https://packaging.python.org/guides/installing-using-pip-and-virtualenv/ and then pip install requirements/base.txt
+To install the project, first of all, create a virtualenv https://packaging.python.org/guides/installing-using-pip-and-virtualenv/ and then pip install requirements.txt
 
-To install for development, create a virtualenv and then pip install -r requirements/dev.txt
 
 Then run migrations python manage.py migrate while at the base folder for the project
 

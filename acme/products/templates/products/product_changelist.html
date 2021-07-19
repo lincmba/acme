@@ -1,9 +1,11 @@
 {% extends 'admin/change_list.html' %}
+{% load static %}
 
 {% block object-tools %}
-    <a href="import-csv/">Import CSV</a>
-    <a href="delete-all/">Delete All</a>
+    <a href="import-csv/" class="green-button">Import CSV</a>
+    <a href="delete-all/" class="red-button">Delete All</a>
 
     <br />
+    <link rel="stylesheet" href="{% static 'products/css/products.css' %}" type="text/css" />
     {{ block.super }}
 {% endblock %}

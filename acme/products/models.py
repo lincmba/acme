@@ -15,8 +15,6 @@ class Product(models.Model):
         auto_now_add=True, null=True, blank=True)
 
 
-
-
 class Webhook(models.Model):
     """
     Model representing webhooks implementation
