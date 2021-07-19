@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django import forms
 import boto3
 import json
+from botocore.client import Config
 
 from django.contrib import admin
 from django.core.files.storage import default_storage
@@ -43,7 +44,10 @@ class ProductAdmin(admin.ModelAdmin):
             file_name = request.GET['file_name']
             file_type = request.GET['file_type']
 
-            s3 = boto3.client('s3')
+            s3 = boto3.client(
+                's3',
+                config=Config(signature_version='s3v4')
+            )
             presigned_post = s3.generate_presigned_post(
                 Bucket=S3_BUCKET,
                 Key=file_name,
