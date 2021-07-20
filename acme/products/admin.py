@@ -98,8 +98,10 @@ class ProductAdmin(admin.ModelAdmin):
         )
 
     def save_model(self, request, obj, form, change):
+        post_to_webhooks.apply_async(kwargs={'product_sku': obj.sku},
+                                     countdown=10) # sometimes the product isn't created yet hence the need to delay for sometime before using webhooks
         super().save_model(request, obj, form, change)
-        post_to_webhooks.delay(obj.sku)
+
 
 
 class WebhookAdmin(admin.ModelAdmin):
