@@ -17,8 +17,8 @@ To contribute pick up one of the issues and then make a pull request.
 If one finds an issue that needs to be fixed, they can raise an issue on https://github.com/lincmba/acme/issues
 
 ### Running Celery Worker
-This project uses http://docs.celeryproject.org/en/latest/ to run asynchronous tasks such as sending emails. To run the celery worker:
+This project uses http://docs.celeryproject.org/en/latest/ to run asynchronous tasks such as processing csv product upload. To run the celery worker:
 
 $ cd root folder of the project
 
-$ celery --app acme worker --loglevel=INFO
+$ celery worker --app acme --loglevel=INFO

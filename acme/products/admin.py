@@ -1,15 +1,16 @@
-from django.http import HttpResponse
-import boto3
 import json
-from botocore.client import Config
 
+import boto3
+from botocore.client import Config
 from django.contrib import admin
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import path
-from acme.products.forms import CsvImportForm
-from acme.products.models import Product, Webhook
-from acme.products.helpers import csv_import_async, post_to_webhooks
+
 from acme.constants import ACME_S3_BUCKET
+from acme.products.forms import CsvImportForm
+from acme.products.helpers import csv_import_async, post_to_webhooks
+from acme.products.models import Product, Webhook
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -20,7 +21,6 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'sku', 'description', 'active')
     search_fields = ('name', 'sku', 'description')
     change_list_template = "products/product_changelist.html"
-
 
     def get_urls(self):
         urls = super().get_urls()
@@ -99,9 +99,8 @@ class ProductAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         post_to_webhooks.apply_async(kwargs={'product_sku': obj.sku},
-                                     countdown=10) # sometimes the product isn't created yet hence the need to delay for sometime before using webhooks
+                                     countdown=10)  # sometimes the product isn't created yet hence the need to delay for sometime before using webhooks
         super().save_model(request, obj, form, change)
-
 
 
 class WebhookAdmin(admin.ModelAdmin):

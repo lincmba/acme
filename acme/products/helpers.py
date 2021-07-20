@@ -1,12 +1,15 @@
 import codecs
 import csv
+
 import boto3
-from botocore.client import Config
 import requests
-from acme.celery import app
+from botocore.client import Config
 from django.contrib.auth.models import User
-from acme.products.models import Product, Webhook
+
+from acme.celery import app
 from acme.constants import ACME_S3_BUCKET
+from acme.products.models import Product, Webhook
+
 
 @app.task()
 def csv_import_async(file_name, user_name=None):
@@ -30,17 +33,16 @@ def csv_import_async(file_name, user_name=None):
 
     if user_name:
         user = User.objects.get(username=user_name)
-    processed = 0
     csv_reader = csv.DictReader(codecs.getreader("utf-8")(obj["Body"]))
-    for row in csv_reader:
-        product, created = Product.objects.get_or_create(
-            sku=row.get('sku'))
-        product.name = row.get('name')
-        product.description = row.get('description')
-        product.created_by = user
-        product.save()
-        processed +=1
-    return {"processed_products": processed}
+    if 'sku' in csv_reader.fieldnames:
+        for row in csv_reader:
+            product, created = Product.objects.get_or_create(
+                sku=row.get('sku'))
+            product.name = row.get('name')
+            product.description = row.get('description')
+            product.created_by = user
+            product.save()
+
 
 @app.task()
 def post_to_webhooks(product_sku):
@@ -54,10 +56,9 @@ def post_to_webhooks(product_sku):
         "name": product.id,
         "sku": product.sku,
         "description": product.description,
-        "active":product.active
+        "active": product.active
     }
     active_webhooks = Webhook.objects.filter(active=True)
     for webhook in active_webhooks:
         headers = {"Content-Type": "application/json"}
         requests.post(webhook.url, headers=headers, data=product_json)
-
