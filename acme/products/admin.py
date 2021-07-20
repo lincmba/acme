@@ -38,9 +38,7 @@ class ProductAdmin(admin.ModelAdmin):
         """
 
         if request.GET:
-            """
-            Sends file to s3 bucket
-            """
+            # Sends file to s3 bucket
             file_name = request.GET['file_name']
             file_type = request.GET['file_type']
             S3_BUCKET = ACME_S3_BUCKET
@@ -69,16 +67,14 @@ class ProductAdmin(admin.ModelAdmin):
             return HttpResponse(resp_data)
 
         if request.method == "POST":
-            """
-            Triggers importing csv from s3 bucket
-            """
+            # Triggers importing csv from s3 bucket
             file_name = request.POST['file-name']
-            csv_import_async.delay(file_name, request.user.username)
+            task = csv_import_async.delay(file_name, request.user.username)
 
             self.message_user(
                 request,
                 f"Your CSV is being imported")
-            return redirect("..")
+            return redirect(f'/events/{ task.id }/livestream')
         form = CsvImportForm()
         payload = {"form": form}
         return render(

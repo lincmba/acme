@@ -5,6 +5,7 @@ import boto3
 import requests
 from botocore.client import Config
 from django.contrib.auth.models import User
+from django_eventstream import send_event
 
 from acme.celery import app
 from acme.constants import ACME_S3_BUCKET
@@ -22,6 +23,7 @@ def csv_import_async(file_name, user_name=None):
     :param user_name: Current user's username
     :return:
     """
+    task_id = csv_import_async.request.id
     s3 = boto3.client(
         's3',
         config=Config(
@@ -32,16 +34,40 @@ def csv_import_async(file_name, user_name=None):
     obj = s3.get_object(Bucket=ACME_S3_BUCKET, Key=file_name)
 
     if user_name:
-        user = User.objects.get(username=user_name)
+        try:
+            user = User.objects.get(username=user_name)
+        except User.DoesNotExist:
+            user = None
     csv_reader = csv.DictReader(codecs.getreader("utf-8")(obj["Body"]))
     if 'sku' in csv_reader.fieldnames:
+        send_event(task_id, 'message',
+                   f'Started processing products from {file_name}')
+        created_products = 0
+        updated_products = 0
+
         for row in csv_reader:
+
             product, created = Product.objects.get_or_create(
                 sku=row.get('sku'))
+            if created:
+                message = f'Creating product: {row.get("sku")}'
+                created_products += 1
+            else:
+                message = f'Updating product: {row.get("sku")}'
+                updated_products += 1
+            send_event(task_id, 'message', message)
             product.name = row.get('name')
             product.description = row.get('description')
             product.created_by = user
             product.save()
+
+        send_event(task_id, 'message',
+                   f'Finished processing products from {file_name}. \
+                   {created_products} products created. \
+                   {updated_products} products updated.')
+    else:
+        send_event(task_id, 'message',
+                   'Invalid csv. Ensure csv has column "sku"')
 
 
 @app.task()

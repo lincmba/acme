@@ -1,4 +1,4 @@
-{% extends 'admin/base.html' %}
+{% extends 'admin/base_site.html' %}
 {% load static %}
 
 {% block content %}
@@ -9,6 +9,7 @@
             <div class="progress-wrapper">
                 <div id="progress-bar-file" class="progress"></div>
             </div>
+            <br/>
             <input id="file-name" type="hidden" name="file-name"/>
             <button id="submit-button" type="submit" disabled>Import CSV
             </button>
